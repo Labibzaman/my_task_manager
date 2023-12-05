@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:task_manager_app/lib/ui/Controller/authController.dart';
 import 'package:task_manager_app/lib/ui/screens/login_screen.dart';
@@ -16,8 +20,23 @@ class ProfileSummary_Card extends StatefulWidget {
 }
 
 class _ProfileSummary_CardState extends State<ProfileSummary_Card> {
+
+  String base64String = AuthController.user?.photo ?? '';
+
+
+
   @override
   Widget build(BuildContext context) {
+    if(base64String.startsWith('data:image')) {
+      // Remove data URI prefix if present
+      base64String =
+          base64String.replaceFirst(RegExp(r'data:image/[^;]+;base64,'), '');
+    }
+
+    Uint8List imageBytes =
+    Base64Decoder().convert(base64String);
+
+
     return ListTile(
       onTap: () {
         if (widget.onenabled == true) {
@@ -27,8 +46,16 @@ class _ProfileSummary_CardState extends State<ProfileSummary_Card> {
                   builder: (context) => const EditProfileScreen()));
         }
       },
-      leading: const CircleAvatar(
-        child: Icon(Icons.person),
+      leading: CircleAvatar(
+        child: AuthController.user?.photo == null
+            ? Icon(Icons.person)
+            : ClipRRect(
+                borderRadius: BorderRadius.circular(300),
+                child: Image.memory(
+                  imageBytes,
+                  fit: BoxFit.cover,
+                ),
+              ),
       ),
       title: Text(
         fullname,
@@ -49,9 +76,10 @@ class _ProfileSummary_CardState extends State<ProfileSummary_Card> {
         onPressed: () async {
           await AuthController.clearAuthData();
           if (mounted) {
-           Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (context){
-             return const loginScreen();
-           }), (route) => false);
+            Navigator.pushAndRemoveUntil(context,
+                MaterialPageRoute(builder: (context) {
+              return const loginScreen();
+            }), (route) => false);
           }
         },
         icon: Icon(Icons.login_outlined),

@@ -70,7 +70,11 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const AddNewTaskScreen();
+            return  AddNewTaskScreen(
+              onTaskAdded: () {
+              getNewTaskList();
+              getTASKcount();
+            },);
           }));
         },
         child: const Icon(CupertinoIcons.plus_circle),
@@ -94,6 +98,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                       child: summaryCard(
                         title: taskcountDetails.sId ?? '',
                         num: taskcountDetails.sum.toString(),
+                        onStatusChange: () {
+                          getTASKcount();
+                          getNewTaskList();
+                        },
                       ),
                     );
                   },
@@ -104,23 +112,30 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 child: Visibility(
               visible: newTaskListInProgress == false,
               replacement: const Center(child: CircularProgressIndicator()),
-              child: ListView.builder(
-                itemCount: taskListModel.taskList?.length ?? 0,
-                itemBuilder: (BuildContext context, int index) {
-                  return Task_item_card(
-                    task: taskListModel.taskList![index],
-                    onStatusChange: () {
-                      getTASKcount();
-                      getNewTaskList();
-                    },
-                    showProgress: (inProgress) {
-                      newTaskListInProgress = inProgress;
-                      if (mounted) {
-                        setState(() {});
-                      }
-                    },
-                  );
-                },
+              child: RefreshIndicator(
+                onRefresh: getNewTaskList,
+                child: ListView.builder(
+                  itemCount: taskListModel.taskList?.length ?? 0,
+                  itemBuilder: (BuildContext context, int index) {
+                    return Task_item_card(
+                      task: taskListModel.taskList![index],
+                      onStatusChange: () {
+                        getTASKcount();
+                        getNewTaskList();
+                      },
+                      showProgress: (inProgress) {
+                        newTaskListInProgress = inProgress;
+                        if (mounted) {
+                          setState(() {});
+                        }
+                      },
+                      refreshSummaryCard: () {
+                        getTASKcount();
+                        getNewTaskList();
+                      },
+                    );
+                  },
+                ),
               ),
             )),
           ],

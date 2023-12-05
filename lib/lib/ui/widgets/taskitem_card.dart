@@ -1,8 +1,9 @@
+
 import 'package:flutter/material.dart';
 import 'package:task_manager_app/lib/data/network_caller.dart';
 import 'package:task_manager_app/lib/data/network_response.dart';
 import 'package:task_manager_app/lib/data/utility/urls.dart';
-
+import 'package:task_manager_app/lib/ui/widgets/snack_message.dart';
 import '../../data/models/task.dart';
 
 enum TaskStatus {
@@ -16,11 +17,13 @@ class Task_item_card extends StatefulWidget {
   Task_item_card({
     super.key,
     required this.task,
-    required this.onStatusChange, required this.showProgress,
+    required this.onStatusChange,
+    required this.showProgress, required this.refreshSummaryCard,
   });
 
   final Task task;
   final VoidCallback onStatusChange;
+  final VoidCallback refreshSummaryCard; // Add this line
   final Function(bool) showProgress;
 
   @override
@@ -32,14 +35,13 @@ class _Task_item_cardState extends State<Task_item_card> {
 
   Future<void> updateTaskstatus(String status) async {
     widget.showProgress(true);
-    final  response = await NetworkCaller().getRequest(Urls.updateTaskStatus(widget.task.sId??'', status));
-    if(response.isSuccess){
-widget.onStatusChange();
-
+    final response = await NetworkCaller()
+        .getRequest(Urls.updateTaskStatus(widget.task.sId ?? '', status));
+    if (response.isSuccess) {
+      widget.onStatusChange();
     }
     widget.showProgress(false);
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +86,9 @@ widget.onStatusChange();
                           showUpdateModal();
                         },
                         icon: const Icon(Icons.edit)),
-
+                    IconButton(
+                        onPressed: deleteTask,
+                        icon: const Icon(Icons.delete_forever_rounded)),
                   ],
                 )
               ],
@@ -94,6 +98,36 @@ widget.onStatusChange();
       ),
     );
   }
+
+  Future<void> deleteTask() async {
+    widget.showProgress(true);
+    setState(() {
+
+    });
+    final NetworkResponse response =
+        await NetworkCaller().getRequest(Urls.deleteTASK(widget.task.sId));
+
+    if (response.isSuccess) {
+      if (mounted) {
+        ShowSnackMessage(context, 'Successfully delete task');
+      }
+      widget.onStatusChange();
+
+      setState(() {
+
+      });
+    }else{
+      if (mounted) {
+        ShowSnackMessage(context, 'failed delete task',true);
+      }
+    }
+    widget.showProgress(true);
+setState(() {
+
+});
+  }
+
+
 
   void showUpdateModal() {
     List<ListTile> items = TaskStatus.values
@@ -129,7 +163,6 @@ widget.onStatusChange();
                       style: TextStyle(color: Colors.grey),
                     ),
                   ),
-
                 ],
               )
             ],

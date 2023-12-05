@@ -70,48 +70,34 @@ class _InProgress_ScreenState extends State<InProgress_Screen> {
         child: Column(
           children: [
             const ProfileSummary_Card(),
-            Visibility(
-              visible: taskSummaryCountprogress == false,
-              replacement: const LinearProgressIndicator(),
-              child: SizedBox(
-                height: 120,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: tasksummarycount.taskCountList?.length ?? 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    Task_count taskcountDetails =
-                    tasksummarycount.taskCountList![index];
-                    return FittedBox(
-                      child: summaryCard(
-                        title: taskcountDetails.sId ?? '',
-                        num: taskcountDetails.sum.toString(),
-                      ),
-                    );
-                  },
-                ),
-              ),
-            ),
+
             Expanded(
                 child: Visibility(
                   visible: newTaskListInProgress == false,
                   replacement: const Center(child: CircularProgressIndicator()),
-                  child: ListView.builder(
-                    itemCount: taskListModel.taskList?.length ?? 0,
-                    itemBuilder: (BuildContext context, int index) {
-                      return Task_item_card(
-                        task: taskListModel.taskList![index],
-                        onStatusChange: () {
+                  child: RefreshIndicator(
+                    onRefresh: getNewTaskList,
+                    child: ListView.builder(
+                      itemCount: taskListModel.taskList?.length ?? 0,
+                      itemBuilder: (BuildContext context, int index) {
+                        return Task_item_card(
+                          task: taskListModel.taskList![index],
+                          onStatusChange: () {
+                            getTASKcount();
+                            getNewTaskList();
+                          },
+                          showProgress: (inProgress) {
+                            newTaskListInProgress = inProgress;
+                            if (mounted) {
+                              setState(() {});
+                            }
+                          }, refreshSummaryCard: () {
                           getTASKcount();
                           getNewTaskList();
                         },
-                        showProgress: (inProgress) {
-                          newTaskListInProgress = inProgress;
-                          if (mounted) {
-                            setState(() {});
-                          }
-                        },
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
                 )),
           ],

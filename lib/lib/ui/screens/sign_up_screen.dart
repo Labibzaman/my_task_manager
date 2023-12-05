@@ -48,6 +48,8 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
                       validator: (String? value) {
                         if (value?.trim().isEmpty ?? true) {
                           return 'Enter email';
+                        }if(!isValidEmail(value!)){
+                          return  'Enter a valid email';
                         }
                         return null;
                       },
@@ -88,6 +90,8 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
                       validator: (String? value) {
                         if (value?.trim().isEmpty ?? true) {
                           return 'Enter Mobile';
+                        }if(!isValidPhoneNumber(value!)){
+                          return 'Enter a valid Mobile number';
                         }
                         return null;
                       },
@@ -237,4 +241,20 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
     _passwordTEcontroller.dispose();
     super.dispose();
   }
+  bool isValidEmail(String email) {
+    // Define a regular expression for a valid email address
+    final RegExp emailRegex = RegExp(
+      r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$',
+    );
+    return emailRegex.hasMatch(email);
+  }
+
+  bool isValidPhoneNumber(String phoneNumber) {
+    // Define a regular expression for a valid phone number
+    final RegExp phoneRegex = RegExp(
+      r'^[0-9]{10}$',
+    );
+    return phoneRegex.hasMatch(phoneNumber);
+  }
+
 }

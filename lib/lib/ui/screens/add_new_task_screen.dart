@@ -8,7 +8,8 @@ import '../widgets/body_background.dart';
 import '../widgets/profile_summary_Card.dart';
 
 class AddNewTaskScreen extends StatefulWidget {
-  const AddNewTaskScreen({super.key});
+   AddNewTaskScreen({super.key, required this.onTaskAdded});
+  final VoidCallback onTaskAdded;
 
   @override
   State<AddNewTaskScreen> createState() => _AddNewTaskScreenState();
@@ -100,6 +101,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     );
   }
 
+
   Future<void> addnewTask() async {
     if (_formkey.currentState!.validate()) {
       isAdded = true;
@@ -117,7 +119,9 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
         setState(() {});
       }
       if (response.isSuccess) {
+        widget.onTaskAdded();
         clearTextfiled();
+
         if (mounted) {
           ShowSnackMessage(context, 'Task Added successfully');
         }

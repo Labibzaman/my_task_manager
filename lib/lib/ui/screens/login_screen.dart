@@ -38,16 +38,18 @@ class _loginScreenState extends State<loginScreen> {
                   children: [
                     Text('Get Started With',
                         style: Theme.of(context).textTheme.titleLarge),
-                    SizedBox(
+                    const SizedBox(
                       height: 16,
                     ),
                     TextFormField(
                       controller: _emailTEcontroller,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(hintText: 'Email'),
+                      decoration: const InputDecoration(hintText: 'Email'),
                       validator: (value) {
                         if (value!.trim().isEmpty) {
                           return 'Enter email';
+                        }if(!isValidEmail(value)){
+                          return  'Enter a valid email';
                         }
                         return null;
                       },
@@ -57,7 +59,7 @@ class _loginScreenState extends State<loginScreen> {
                     ),
                     TextFormField(
                       controller: _passwordTEcontroller,
-                      decoration: InputDecoration(hintText: 'Password'),
+                      decoration: const InputDecoration(hintText: 'Password'),
                       validator: (value) {
                         if (value!.isEmpty) {
                           return 'Enter Password';
@@ -203,5 +205,13 @@ class _loginScreenState extends State<loginScreen> {
     _emailTEcontroller.dispose();
     _passwordTEcontroller.dispose();
     super.dispose();
+  }
+
+  bool isValidEmail(String email) {
+    // Define a regular expression for a valid email address
+    final RegExp emailRegex = RegExp(
+      r'^[\w-]+(\.[\w-]+)*@[\w-]+(\.[\w-]+)+$',
+    );
+    return emailRegex.hasMatch(email);
   }
 }
