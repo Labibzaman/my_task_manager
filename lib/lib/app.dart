@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:task_manager_app/lib/ui/Controller/New_task_controller.dart';
+import 'package:task_manager_app/lib/ui/Controller/authController.dart';
 import 'package:task_manager_app/lib/ui/Controller/login_controller.dart';
+import 'package:task_manager_app/lib/ui/Controller/progressTaskController.dart';
 import 'package:task_manager_app/lib/ui/screens/splash_screen.dart';
 
 class TasKmanagerApp extends StatefulWidget {
@@ -55,7 +57,9 @@ class _TasKmanagerAppState extends State<TasKmanagerApp> {
 class ControllerBindings extends Bindings {
   @override
   void dependencies() {
+    Get.put(AuthController());
     Get.put(LoginController());
     Get.put(NewTask_Controller());
+    Get.put(ProgressTaskController());
   }
 }

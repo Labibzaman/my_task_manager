@@ -1,8 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-import 'package:get/get_state_manager/src/simple/get_state.dart';
+
 import 'package:task_manager_app/lib/data/models/task_count.dart';
 import 'package:task_manager_app/lib/data/network_caller.dart';
 import 'package:task_manager_app/lib/data/network_response.dart';
@@ -98,16 +97,17 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 ),
               ),
             ),
-            Expanded(child:
-                GetBuilder<NewTask_Controller>(builder: (newTaskController) {
+            Expanded(
+                child:GetBuilder<NewTask_Controller>(
+                    builder: (newTaskController){
+
               return Visibility(
                 visible: newTaskController.newTaskListinProgress == false,
                 replacement: const Center(child: CircularProgressIndicator()),
                 child: RefreshIndicator(
                   onRefresh: () => newTaskController.getNewTaskList(),
                   child: ListView.builder(
-                    itemCount:
-                        newTaskController.taskListModel.taskList?.length ?? 0,
+                    itemCount: newTaskController.taskListModel.taskList?.length ?? 0,
                     itemBuilder: (BuildContext context, int index) {
                       return Task_item_card(
                         task: newTaskController.taskListModel.taskList![index],

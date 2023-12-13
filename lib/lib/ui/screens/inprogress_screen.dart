@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
+import 'package:task_manager_app/lib/ui/Controller/progressTaskController.dart';
 import '../../data/models/task_counModel.dart';
 import '../../data/models/task_count.dart';
 import '../../data/models/task_model.dart';
@@ -17,6 +21,7 @@ class InProgress_Screen extends StatefulWidget {
 }
 
 class _InProgress_ScreenState extends State<InProgress_Screen> {
+
   bool newTaskListInProgress = false;
   bool taskSummaryCountprogress = false;
 
@@ -39,26 +44,12 @@ class _InProgress_ScreenState extends State<InProgress_Screen> {
     }
   }
 
-  Future<void> getNewTaskList() async {
-    newTaskListInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
-    final NetworkResponse response =
-    await NetworkCaller().getRequest(Urls.getProgressTaskList);
-    if (response.isSuccess) {
-      taskListModel = Task_Model.fromJson(response.jsonResponse);
-    }
-    newTaskListInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-  }
+
 
   @override
   void initState() {
     super.initState();
-    getNewTaskList();
+    Get.find<ProgressTaskController>().getProgressTaskList();
     getTASKcount();
   }
 
@@ -72,33 +63,32 @@ class _InProgress_ScreenState extends State<InProgress_Screen> {
             const ProfileSummary_Card(),
 
             Expanded(
-                child: Visibility(
-                  visible: newTaskListInProgress == false,
-                  replacement: const Center(child: CircularProgressIndicator()),
-                  child: RefreshIndicator(
-                    onRefresh: getNewTaskList,
-                    child: ListView.builder(
-                      itemCount: taskListModel.taskList?.length ?? 0,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Task_item_card(
-                          task: taskListModel.taskList![index],
-                          onStatusChange: () {
-                            getTASKcount();
-                            getNewTaskList();
+                child: GetBuilder<ProgressTaskController>(
+                  builder: (progressTask) {
+                    return Visibility(
+                      visible: progressTask.newTaskListProgress == false,
+                      replacement: const Center(child: CircularProgressIndicator()),
+                      child: RefreshIndicator(
+                        onRefresh:()=> progressTask.getProgressTaskList(),
+                        child: ListView.builder(
+                          itemCount: progressTask.TasklistModel.taskList?.length ?? 0,
+                          itemBuilder: (BuildContext context, int index) {
+                            return Task_item_card(
+                              task: progressTask.TasklistModel.taskList![index],
+                              onStatusChange: () {
+                                getTASKcount();
+                                progressTask.getProgressTaskList();
+                              },
+                              showProgress: (inProgress) {}, refreshSummaryCard: () {
+                              getTASKcount();
+                              progressTask.getProgressTaskList();
+                            },
+                            );
                           },
-                          showProgress: (inProgress) {
-                            newTaskListInProgress = inProgress;
-                            if (mounted) {
-                              setState(() {});
-                            }
-                          }, refreshSummaryCard: () {
-                          getTASKcount();
-                          getNewTaskList();
-                        },
-                        );
-                      },
-                    ),
-                  ),
+                        ),
+                      ),
+                    );
+                  }
                 )),
           ],
         ),
