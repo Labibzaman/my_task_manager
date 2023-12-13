@@ -1,6 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:task_manager_app/lib/data/models/userModels.dart';
 import 'package:task_manager_app/lib/data/network_caller.dart';
@@ -28,15 +30,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   GlobalKey<FormState> _formKey = GlobalKey();
   bool inProgress = false;
   XFile? photo;
-
+ AuthController authController = Get.find<AuthController>();
 
   @override
   void initState() {
     super.initState();
-    emailTeController.text = AuthController.user?.email ?? '';
-    FirstNameTeController.text = AuthController.user?.firstName ?? '';
-    LastNameTeController.text = AuthController.user?.lastName ?? '';
-    MobileTeController.text = AuthController.user?.mobile ?? '';
+    emailTeController.text = authController.user?.email ?? '';
+    FirstNameTeController.text = authController.user?.firstName ?? '';
+    LastNameTeController.text = authController.user?.lastName ?? '';
+    MobileTeController.text = authController.user?.mobile ?? '';
   }
 
   @override
@@ -197,12 +199,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         body: inputData,
       );
       if (response.isSuccess) {
-        AuthController.UpdateUserInformation(UserModel(
+        Get.find<AuthController>().UpdateUserInformation(UserModel(
           email: emailTeController.text.trim(),
           firstName: FirstNameTeController.text.trim(),
           lastName: LastNameTeController.text.trim(),
           mobile: MobileTeController.text.trim(),
-          photo:photoinBase64 ?? AuthController.user?.photo
+          photo:photoinBase64 ?? Get.find<AuthController>().user?.photo
         ));
         if (mounted) {
           ShowSnackMessage(context, 'Success');

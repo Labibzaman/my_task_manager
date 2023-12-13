@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:task_manager_app/lib/data/models/userModels.dart';
 import 'package:task_manager_app/lib/ui/Controller/authController.dart';
+import 'package:task_manager_app/lib/ui/Controller/login_controller.dart';
 import 'package:task_manager_app/lib/ui/screens/sign_up_screen.dart';
 import '../../data/network_caller.dart';
 import '../../data/network_response.dart';
@@ -21,8 +24,7 @@ class _loginScreenState extends State<loginScreen> {
   final TextEditingController _emailTEcontroller = TextEditingController();
   final TextEditingController _passwordTEcontroller = TextEditingController();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-  bool _loginInProgress = false;
-
+final LoginController _loginController = Get.find<LoginController>();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,20 +74,19 @@ class _loginScreenState extends State<loginScreen> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: Visibility(
-                        visible: _loginInProgress == false,
-                        replacement:
-                            const Center(child: CircularProgressIndicator()),
-                        child: Visibility(
-                          visible: _loginInProgress == false,
-                          replacement:
-                              const Center(child: CircularProgressIndicator()),
-                          child: ElevatedButton(
-                            onPressed: login,
-                            child:
-                                const Icon(Icons.arrow_circle_right_outlined),
-                          ),
-                        ),
+                      child: GetBuilder<LoginController>(
+                        builder: (loginController) {
+                          return Visibility(
+                            visible: loginController.LoginProgress == false,
+                            replacement:
+                                const Center(child: CircularProgressIndicator()),
+                            child: ElevatedButton(
+                              onPressed: login,
+                              child:
+                                  const Icon(Icons.arrow_circle_right_outlined),
+                            ),
+                          );
+                        }
                       ),
                     ),
                     const SizedBox(
@@ -155,50 +156,20 @@ class _loginScreenState extends State<loginScreen> {
 
   Future<void> login() async {
 
-    if (_formkey.currentState!.validate()) {
-      _loginInProgress = true;
-      if (mounted) {
-        setState(() {});
-      }
-      final NetworkResponse response = await NetworkCaller().postRequest(
-        Urls.login,
-        body: {"email": _emailTEcontroller.text, "password": _passwordTEcontroller.text},isLogin: true
-      );
-      _loginInProgress = false;
-      if (mounted) {
-        setState(() {});
-      }
-      if (response.isSuccess) {
-        await AuthController.SaveUserInformation(
-          response.jsonResponse['token'],
-          UserModel.fromJson(
-            response.jsonResponse['data'],
-          ),
-
-        );
-        if (mounted) {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) {
-                return const MainBottomNavScreen();
-              },
-            ),
-          );
-        }
+    if(!_formkey.currentState!.validate()){
+      return;
+    }
+      final response = await _loginController.login(
+          _emailTEcontroller.text.trim(), _passwordTEcontroller.text.trim());
+      if (response) {
+        Get.offAll(const MainBottomNavScreen());
       } else {
-        if (response.statusCode == 401) {
-          if (mounted) {
-            ShowSnackMessage(context, 'password/email is inCorrect');
-          }
-        } else {
-          if (mounted) {
-            ShowSnackMessage(context, 'Something went wrong,');
-          }
+        if (mounted) {
+          ShowSnackMessage(context, _loginController.message);
         }
       }
     }
-  }
+
 
   @override
   void dispose() {

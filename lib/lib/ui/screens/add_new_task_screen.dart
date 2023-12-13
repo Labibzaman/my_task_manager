@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:task_manager_app/lib/data/network_caller.dart';
 import 'package:task_manager_app/lib/data/network_response.dart';
 import 'package:task_manager_app/lib/data/utility/urls.dart';
 import 'package:task_manager_app/lib/ui/widgets/snack_message.dart';
 
+import '../Controller/New_task_controller.dart';
 import '../widgets/body_background.dart';
 import '../widgets/profile_summary_Card.dart';
 
 class AddNewTaskScreen extends StatefulWidget {
-   AddNewTaskScreen({super.key, required this.onTaskAdded});
+  AddNewTaskScreen({super.key, required this.onTaskAdded});
+
   final VoidCallback onTaskAdded;
 
   @override
@@ -101,7 +105,6 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
     );
   }
 
-
   Future<void> addnewTask() async {
     if (_formkey.currentState!.validate()) {
       isAdded = true;
@@ -121,13 +124,14 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
       if (response.isSuccess) {
         widget.onTaskAdded();
         clearTextfiled();
+        Get.find<NewTask_Controller>().getNewTaskList();
 
         if (mounted) {
           ShowSnackMessage(context, 'Task Added successfully');
         }
-      }else{
+      } else {
         if (mounted) {
-          ShowSnackMessage(context, 'Something went wrong',true);
+          ShowSnackMessage(context, 'Something went wrong', true);
         }
       }
     }

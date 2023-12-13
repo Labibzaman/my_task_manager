@@ -1,10 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:task_manager_app/lib/data/models/task_count.dart';
 import 'package:task_manager_app/lib/data/models/task_model.dart';
 import 'package:task_manager_app/lib/data/network_caller.dart';
 import 'package:task_manager_app/lib/data/network_response.dart';
 import 'package:task_manager_app/lib/data/utility/urls.dart';
+import 'package:task_manager_app/lib/ui/Controller/New_task_controller.dart';
 import '../../data/models/task_counModel.dart';
 import '../widgets/profile_summary_Card.dart';
 import '../widgets/showsummary_card.dart';
@@ -19,10 +23,7 @@ class NewTaskScreen extends StatefulWidget {
 }
 
 class _NewTaskScreenState extends State<NewTaskScreen> {
-  bool newTaskListInProgress = false;
   bool taskSummaryCountprogress = false;
-
-  Task_Model taskListModel = Task_Model();
   Task_summaryCountModel tasksummarycount = Task_summaryCountModel();
 
   Future<void> getTASKcount() async {
@@ -41,26 +42,10 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
     }
   }
 
-  Future<void> getNewTaskList() async {
-    newTaskListInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
-    final NetworkResponse response =
-        await NetworkCaller().getRequest(Urls.getNewTaskList);
-    if (response.isSuccess) {
-      taskListModel = Task_Model.fromJson(response.jsonResponse);
-    }
-    newTaskListInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-  }
-
   @override
   void initState() {
     super.initState();
-    getNewTaskList();
+    Get.find<NewTask_Controller>().getNewTaskList();
     getTASKcount();
   }
 
@@ -68,14 +53,21 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return  AddNewTaskScreen(
+        onPressed: () async {
+          final response = await Navigator.push(context,
+              MaterialPageRoute(builder: (context) {
+            return AddNewTaskScreen(
               onTaskAdded: () {
-              getNewTaskList();
-              getTASKcount();
-            },);
+                getTASKcount();
+                Get.find<NewTask_Controller>().getNewTaskList();
+              },
+            );
           }));
+          if (response != null && response == true) {
+            getTASKcount();
+            Get.find<NewTask_Controller>().getNewTaskList();
+            getTASKcount();
+          }
         },
         child: const Icon(CupertinoIcons.plus_circle),
       ),
@@ -100,7 +92,6 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                         num: taskcountDetails.sum.toString(),
                         onStatusChange: () {
                           getTASKcount();
-                          getNewTaskList();
                         },
                       ),
                     );
@@ -108,36 +99,34 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
                 ),
               ),
             ),
-            Expanded(
-                child: Visibility(
-              visible: newTaskListInProgress == false,
-              replacement: const Center(child: CircularProgressIndicator()),
-              child: RefreshIndicator(
-                onRefresh: getNewTaskList,
-                child: ListView.builder(
-                  itemCount: taskListModel.taskList?.length ?? 0,
-                  itemBuilder: (BuildContext context, int index) {
-                    return Task_item_card(
-                      task: taskListModel.taskList![index],
-                      onStatusChange: () {
-                        getTASKcount();
-                        getNewTaskList();
-                      },
-                      showProgress: (inProgress) {
-                        newTaskListInProgress = inProgress;
-                        if (mounted) {
-                          setState(() {});
-                        }
-                      },
-                      refreshSummaryCard: () {
-                        getTASKcount();
-                        getNewTaskList();
-                      },
-                    );
-                  },
+            Expanded(child:
+                GetBuilder<NewTask_Controller>(builder: (newTaskController) {
+              return Visibility(
+                visible: newTaskController.newTaskListinProgress == false,
+                replacement: const Center(child: CircularProgressIndicator()),
+                child: RefreshIndicator(
+                  onRefresh: () => newTaskController.getNewTaskList(),
+                  child: ListView.builder(
+                    itemCount:
+                        newTaskController.taskListModel.taskList?.length ?? 0,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Task_item_card(
+                        task: newTaskController.taskListModel.taskList![index],
+                        onStatusChange: () {
+                          getTASKcount();
+                          newTaskController.getNewTaskList();
+                        },
+                        showProgress: (inProgress) {},
+                        refreshSummaryCard: () {
+                          getTASKcount();
+                          newTaskController.getNewTaskList();
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            )),
+              );
+            })),
           ],
         ),
       ),
