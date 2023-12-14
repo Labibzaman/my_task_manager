@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:task_manager_app/lib/data/network_caller.dart';
 import 'package:task_manager_app/lib/data/network_response.dart';
 import 'package:task_manager_app/lib/data/utility/urls.dart';
@@ -22,6 +24,8 @@ class _Set_password_screenState extends State<Set_password_screen> {
   TextEditingController Confirmpassword = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey();
 
+  bool inProgress = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +44,7 @@ class _Set_password_screenState extends State<Set_password_screen> {
                     const SizedBox(
                       height: 16,
                     ),
-                    Text(
+                    const Text(
                       'Password shoud be minimum 8 letters',
                       style: TextStyle(
                         fontWeight: FontWeight.w200,
@@ -59,9 +63,9 @@ class _Set_password_screenState extends State<Set_password_screen> {
                         return null;
                       },
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(hintText: 'New password'),
+                      decoration: const InputDecoration(hintText: 'New password'),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 16,
                     ),
                     TextFormField(
@@ -73,19 +77,23 @@ class _Set_password_screenState extends State<Set_password_screen> {
                         return null;
                       },
                       keyboardType: TextInputType.emailAddress,
-                      decoration: InputDecoration(hintText: 'confirm password'),
+                      decoration: const InputDecoration(hintText: 'confirm password'),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 10,
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: confirmPassword,
-                        child: Text('Confirm'),
+                      child: Visibility(
+                        visible: inProgress ==false,
+                        replacement: const Center(child: CircularProgressIndicator()),
+                        child: ElevatedButton(
+                          onPressed: confirmPassword,
+                          child: const Text('Confirm'),
+                        ),
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 28,
                     ),
                     Row(
@@ -93,7 +101,7 @@ class _Set_password_screenState extends State<Set_password_screen> {
                       children: [
                         TextButton(
                           onPressed: () {},
-                          child: Text(
+                          child: const Text(
                             "Have an Account ?",
                             style: TextStyle(
                               fontSize: 16,
@@ -109,7 +117,7 @@ class _Set_password_screenState extends State<Set_password_screen> {
                               return const loginScreen();
                             }), (route) => false);
                           },
-                          child: Text(
+                          child: const Text(
                             'Sign In',
                             style: TextStyle(
                               fontSize: 16,
@@ -131,26 +139,36 @@ class _Set_password_screenState extends State<Set_password_screen> {
 
   Future<void> confirmPassword() async {
     if (_formKey.currentState!.validate()) {
+      inProgress = true;
+      setState(() {
+
+      });
       final NetworkResponse response = await NetworkCaller()
           .postRequest(Urls.recoverResetPassword, body: {
         "email": widget.email,
         "OTP": widget.otp,
         "password": Confirmpassword.text
       });
+      inProgress=false;
+      setState(() {
+
+      });
       if (response.isSuccess) {
         if (mounted) {
           ShowSnackMessage(context, 'PassWord changed ');
         }
         if (mounted) {
-          Navigator.push(context, MaterialPageRoute(builder: (context) {
-            return const loginScreen();
-          }));
+          Get.to(const loginScreen());
         }
       } else {
         if (mounted) {
           ShowSnackMessage(context, 'Password changed failed');
         }
       }
+      inProgress=false;
+      setState(() {
+
+      });
     }
   }
 }

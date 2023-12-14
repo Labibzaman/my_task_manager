@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:task_manager_app/lib/ui/Controller/New_task_controller.dart';
+import 'package:task_manager_app/lib/ui/Controller/ScreenControllers/forgetController.dart';
 import 'package:task_manager_app/lib/ui/Controller/authController.dart';
+import 'package:task_manager_app/lib/ui/Controller/cancelled_controller.dart';
+import 'package:task_manager_app/lib/ui/Controller/completeTaskController.dart';
 import 'package:task_manager_app/lib/ui/Controller/login_controller.dart';
 import 'package:task_manager_app/lib/ui/Controller/progressTaskController.dart';
 import 'package:task_manager_app/lib/ui/screens/splash_screen.dart';
@@ -61,5 +64,8 @@ class ControllerBindings extends Bindings {
     Get.put(LoginController());
     Get.put(NewTask_Controller());
     Get.put(ProgressTaskController());
+    Get.put(CancelledController());
+    Get.put(CompleteTaskController());
+    Get.put(ForgetController());
   }
 }

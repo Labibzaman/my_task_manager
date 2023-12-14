@@ -97,7 +97,7 @@ class NetworkCaller {
     Navigator.pushAndRemoveUntil(
       TasKmanagerApp.NavigationKey.currentContext!,
       MaterialPageRoute(builder: (context) {
-        return loginScreen();
+        return const loginScreen();
       }),
       (route) => false,
     );

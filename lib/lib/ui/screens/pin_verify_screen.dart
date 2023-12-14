@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:task_manager_app/lib/data/network_caller.dart';
 import 'package:task_manager_app/lib/data/network_response.dart';
@@ -71,7 +73,7 @@ class _Pin_verify_screenState extends State<Pin_verify_screen> {
                         selectedFillColor: Colors.white,
                         inactiveFillColor: Colors.white,
                       ),
-                      animationDuration: Duration(milliseconds: 300),
+                      animationDuration: const Duration(milliseconds: 300),
                       enableActiveFill: true,
                       onCompleted: (v) {},
                       onChanged: (value) {},
@@ -88,9 +90,10 @@ class _Pin_verify_screenState extends State<Pin_verify_screen> {
                       child: ElevatedButton(
                         onPressed: verifyOTP,
                         child: Visibility(
-                          visible: inProgress==false,
-                            replacement: Center(child: CircularProgressIndicator()),
-                            child: Text('Verify')),
+                            visible: inProgress == false,
+                            replacement: const Center(
+                                child: CircularProgressIndicator()),
+                            child: const Text('Verify')),
                       ),
                     ),
                     const SizedBox(
@@ -138,32 +141,36 @@ class _Pin_verify_screenState extends State<Pin_verify_screen> {
   }
 
   Future<void> verifyOTP() async {
-    if(_formKey.currentState!.validate()){
-    inProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
-    if (mounted) {
-      ShowSnackMessage(context, 'Please wait for confirmation');
-    }
-    final NetworkResponse response = await NetworkCaller()
-        .getRequest(Urls.verifyOTP(widget.email, pinController.text));
-    if (response.isSuccess) {
+    if (_formKey.currentState!.validate()) {
+      inProgress = true;
       if (mounted) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return Set_password_screen(email: widget.email, otp:pinController.text,);
-        }));
+        setState(() {});
       }
-    } else {
       if (mounted) {
-        ShowSnackMessage(context, 'Pin verification failed');
+        ShowSnackMessage(context, 'Please wait for confirmation');
       }
-    }
-    inProgress=false;
-    if(mounted){
-      setState(() {
+      final NetworkResponse response = await NetworkCaller()
+          .getRequest(Urls.verifyOTP(widget.email, pinController.text));
 
-      });
-    }}
+      if (response.isSuccess && response.jsonResponse != null) {
+        Map<dynamic, dynamic> pinVerify = response.jsonResponse;
+        if (pinVerify['status'] == 'success') {
+          if (mounted) {
+            Get.to(Set_password_screen(
+              email: widget.email,
+              otp: pinController.text,
+            ));
+            inProgress = false;
+            setState(() {});
+          }
+        } else {
+          if (mounted) {
+            ShowSnackMessage(context, 'Invalid Pin verification failed');
+          }
+        }
+        inProgress = false;
+        setState(() {});
+      }
+    }
   }
 }

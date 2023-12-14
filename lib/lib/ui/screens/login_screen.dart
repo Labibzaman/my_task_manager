@@ -129,10 +129,7 @@ final LoginController _loginController = Get.find<LoginController>();
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return const Sign_up_screen();
-                            }));
+                            Get.to(const Sign_up_screen());
                           },
                           child: const Text(
                             'Sign Up',

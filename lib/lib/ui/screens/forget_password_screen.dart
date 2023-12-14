@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:task_manager_app/lib/data/network_caller.dart';
 import 'package:task_manager_app/lib/data/network_response.dart';
 import 'package:task_manager_app/lib/data/utility/urls.dart';
+import 'package:task_manager_app/lib/ui/Controller/ScreenControllers/forgetController.dart';
 import 'package:task_manager_app/lib/ui/screens/pin_verify_screen.dart';
 
 import '../widgets/body_background.dart';
@@ -17,6 +20,8 @@ class Forget_screen extends StatefulWidget {
 class _Forget_screenState extends State<Forget_screen> {
   TextEditingController emailControler = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey();
+
+  final ForgetController forgetController = Get.find<ForgetController>();
   bool inProgress = false;
 
   @override
@@ -65,11 +70,14 @@ class _Forget_screenState extends State<Forget_screen> {
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: getVerifyemail,
-                        child: Visibility(
-                            visible: inProgress == false,
-                            replacement:
-                                const Center(child: CircularProgressIndicator()),
-                            child: const Icon(Icons.arrow_circle_right_outlined)),
+                        child: GetBuilder<ForgetController>(builder: (forget) {
+                          return Visibility(
+                            visible: forget.inProgress == false,
+                            replacement: const Center(
+                                child: CircularProgressIndicator()),
+                            child: Text('Get OTP'),
+                          );
+                        }),
                       ),
                     ),
                     const SizedBox(
@@ -117,30 +125,37 @@ class _Forget_screenState extends State<Forget_screen> {
   }
 
   Future<void> getVerifyemail() async {
-    if(_formKey.currentState!.validate()){
-
-
-    if (mounted) {
-      ShowSnackMessage(context, 'Please wait for confirmation');
+    if (!_formKey.currentState!.validate()) {
+      return;
     }
-    inProgress = true;
-    setState(() {});
-    final NetworkResponse response =
-        await NetworkCaller().getRequest(Urls.verifyEmail(emailControler.text));
-    if (response.isSuccess) {
-
-      if (mounted) {
-        Navigator.push(context, MaterialPageRoute(builder: (context) {
-          return  Pin_verify_screen(email:emailControler.text);
-        }));
-      }
+    final response = await forgetController.getVerifyemail(emailControler.text);
+    if (response) {
+      Get.to(Pin_verify_screen(email: emailControler.text));
     } else {
       if (mounted) {
-        ShowSnackMessage(context, 'Enter correct email');
+        ShowSnackMessage(context, forgetController.message);
       }
     }
-    inProgress = false;
-    setState(() {});
-  }}
-
+  }
 }
+
+// Future<void> getVerifyemail() async {
+//   if(_formKey.currentState!.validate()){
+//
+//     if (mounted) {
+//       ShowSnackMessage(context, 'Please wait for confirmation');
+//     }
+//     inProgress = true;
+//     setState(() {});
+//     final NetworkResponse response =
+//     await NetworkCaller().getRequest(Urls.verifyEmail(emailControler.text));
+//     if (response.isSuccess) {
+//       Get.to(Pin_verify_screen(email:emailControler.text));
+//     } else {
+//       if (mounted) {
+//         ShowSnackMessage(context, 'Enter correct email');
+//       }
+//     }
+//     inProgress = false;
+//     setState(() {});
+//   }}

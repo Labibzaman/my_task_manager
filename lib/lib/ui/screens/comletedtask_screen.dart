@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:task_manager_app/lib/ui/Controller/completeTaskController.dart';
 
 import '../../data/models/task_counModel.dart';
 import '../../data/models/task_count.dart';
@@ -18,37 +21,14 @@ class Completed_screen extends StatefulWidget {
 }
 
 class _Completed_screenState extends State<Completed_screen> {
-
-  bool newTaskListInProgress = false;
-  bool taskSummaryCountprogress = false;
-
-  Task_Model taskListModel = Task_Model();
-  Task_summaryCountModel tasksummarycount = Task_summaryCountModel();
-
-
-  Future<void> getNewTaskList() async {
-    newTaskListInProgress = true;
-    if (mounted) {
-      setState(() {});
-    }
-    final NetworkResponse response =
-    await NetworkCaller().getRequest(Urls.getCompletedTaskList);
-    if (response.isSuccess) {
-      taskListModel = Task_Model.fromJson(response.jsonResponse);
-    }
-    newTaskListInProgress = false;
-    if (mounted) {
-      setState(() {});
-    }
-  }
+  CompleteTaskController completeTaskController =
+      Get.find<CompleteTaskController>();
 
   @override
   void initState() {
     super.initState();
-    getNewTaskList();
-
+    Get.find<CompleteTaskController>().getNewTaskList();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -57,39 +37,34 @@ class _Completed_screenState extends State<Completed_screen> {
         child: Column(
           children: [
             const ProfileSummary_Card(),
-
-            Expanded(
-                child: Visibility(
-                  visible: newTaskListInProgress == false,
-                  replacement: const Center(child: CircularProgressIndicator()),
-                  child: RefreshIndicator(
-                    onRefresh: getNewTaskList,
-                    child: ListView.builder(
-                      itemCount: taskListModel.taskList?.length ?? 0,
-                      itemBuilder: (BuildContext context, int index) {
-                        return Task_item_card(
-                          task: taskListModel.taskList![index],
-                          onStatusChange: () {
-
-                            getNewTaskList();
-                          },
-                          showProgress: (inProgress) {
-                            newTaskListInProgress = inProgress;
-                            if (mounted) {
-                              setState(() {});
-                            }
-                          }, refreshSummaryCard: () {
-                          getNewTaskList();
+            Expanded(child:
+                GetBuilder<CompleteTaskController>(builder: (completeTask) {
+              return Visibility(
+                visible: completeTask.newTaskListProgress == false,
+                replacement: const Center(child: CircularProgressIndicator()),
+                child: RefreshIndicator(
+                  onRefresh: () => completeTask.getNewTaskList(),
+                  child: ListView.builder(
+                    itemCount: completeTask.taskListModel.taskList?.length ?? 0,
+                    itemBuilder: (BuildContext context, int index) {
+                      return Task_item_card(
+                        task: completeTask.taskListModel.taskList![index],
+                        onStatusChange: () {
+                          completeTask.getNewTaskList();
                         },
-                        );
-                      },
-                    ),
+                        showProgress: (inProgress) {},
+                        refreshSummaryCard: () {
+                          completeTask.getNewTaskList();
+                        },
+                      );
+                    },
                   ),
-                )),
+                ),
+              );
+            })),
           ],
         ),
       ),
     );
   }
 }
-
