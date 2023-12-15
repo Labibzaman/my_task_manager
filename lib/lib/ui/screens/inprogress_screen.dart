@@ -22,7 +22,6 @@ class InProgress_Screen extends StatefulWidget {
 
 class _InProgress_ScreenState extends State<InProgress_Screen> {
 
-  bool newTaskListInProgress = false;
   bool taskSummaryCountprogress = false;
 
   Task_Model taskListModel = Task_Model();
@@ -61,7 +60,6 @@ class _InProgress_ScreenState extends State<InProgress_Screen> {
         child: Column(
           children: [
             const ProfileSummary_Card(),
-
             Expanded(
                 child: GetBuilder<ProgressTaskController>(
                   builder: (progressTask) {

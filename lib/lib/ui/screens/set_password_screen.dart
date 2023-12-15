@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
-import 'package:task_manager_app/lib/data/network_caller.dart';
-import 'package:task_manager_app/lib/data/network_response.dart';
-import 'package:task_manager_app/lib/data/utility/urls.dart';
-
+import 'package:task_manager_app/lib/ui/Controller/ScreenControllers/confirmPassword.dart';
 import '../widgets/body_background.dart';
-import '../widgets/snack_message.dart';
 import 'login_screen.dart';
 
 class Set_password_screen extends StatefulWidget {
@@ -21,9 +17,10 @@ class Set_password_screen extends StatefulWidget {
 
 class _Set_password_screenState extends State<Set_password_screen> {
   TextEditingController newpassword = TextEditingController();
-  TextEditingController Confirmpassword = TextEditingController();
+  TextEditingController Confirmpasswordcontroller = TextEditingController();
   GlobalKey<FormState> _formKey = GlobalKey();
-
+  ConfirmPasswordController confirmPasswordController =
+      Get.find<ConfirmPasswordController>();
   bool inProgress = false;
 
   @override
@@ -63,13 +60,14 @@ class _Set_password_screenState extends State<Set_password_screen> {
                         return null;
                       },
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(hintText: 'New password'),
+                      decoration:
+                          const InputDecoration(hintText: 'New password'),
                     ),
                     const SizedBox(
                       height: 16,
                     ),
                     TextFormField(
-                      controller: Confirmpassword,
+                      controller: Confirmpasswordcontroller,
                       validator: (value) {
                         if (value!.trim().isEmpty) {
                           return 'Enter same Password';
@@ -77,21 +75,34 @@ class _Set_password_screenState extends State<Set_password_screen> {
                         return null;
                       },
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(hintText: 'confirm password'),
+                      decoration:
+                          const InputDecoration(hintText: 'confirm password'),
                     ),
                     const SizedBox(
                       height: 10,
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: Visibility(
-                        visible: inProgress ==false,
-                        replacement: const Center(child: CircularProgressIndicator()),
-                        child: ElevatedButton(
-                          onPressed: confirmPassword,
-                          child: const Text('Confirm'),
-                        ),
-                      ),
+                      child: GetBuilder<ConfirmPasswordController>(
+                          builder: (password) {
+                        return Visibility(
+                          visible: password.inProgress == false,
+                          replacement:
+                              const Center(child: CircularProgressIndicator()),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                confirmPasswordController.confirmPassword(
+                                  widget.email,
+                                  widget.otp,
+                                  Confirmpasswordcontroller.text,
+                                );
+                              }
+                            },
+                            child: const Text('Confirm'),
+                          ),
+                        );
+                      }),
                     ),
                     const SizedBox(
                       height: 28,
@@ -112,10 +123,7 @@ class _Set_password_screenState extends State<Set_password_screen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushAndRemoveUntil(context,
-                                MaterialPageRoute(builder: (context) {
-                              return const loginScreen();
-                            }), (route) => false);
+                            Get.offAll(const loginScreen());
                           },
                           child: const Text(
                             'Sign In',
@@ -135,40 +143,5 @@ class _Set_password_screenState extends State<Set_password_screen> {
         ),
       ),
     );
-  }
-
-  Future<void> confirmPassword() async {
-    if (_formKey.currentState!.validate()) {
-      inProgress = true;
-      setState(() {
-
-      });
-      final NetworkResponse response = await NetworkCaller()
-          .postRequest(Urls.recoverResetPassword, body: {
-        "email": widget.email,
-        "OTP": widget.otp,
-        "password": Confirmpassword.text
-      });
-      inProgress=false;
-      setState(() {
-
-      });
-      if (response.isSuccess) {
-        if (mounted) {
-          ShowSnackMessage(context, 'PassWord changed ');
-        }
-        if (mounted) {
-          Get.to(const loginScreen());
-        }
-      } else {
-        if (mounted) {
-          ShowSnackMessage(context, 'Password changed failed');
-        }
-      }
-      inProgress=false;
-      setState(() {
-
-      });
-    }
   }
 }

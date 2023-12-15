@@ -20,12 +20,12 @@ class _summaryCardState extends State<summaryCard> {
   Widget build(BuildContext context) {
     return Card(
       child: Padding(
-        padding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 18),
+        padding: const EdgeInsets.symmetric(vertical: 18.0, horizontal: 18),
         child: Column(
           children: [
             Text(
               widget.num,
-              style: TextStyle(fontSize: 22),
+              style: const TextStyle(fontSize: 22),
             ),
             Text(widget.title),
 

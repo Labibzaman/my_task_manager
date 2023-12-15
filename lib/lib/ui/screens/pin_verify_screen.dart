@@ -156,7 +156,7 @@ class _Pin_verify_screenState extends State<Pin_verify_screen> {
         Map<dynamic, dynamic> pinVerify = response.jsonResponse;
         if (pinVerify['status'] == 'success') {
           if (mounted) {
-            Get.to(Set_password_screen(
+            Get.offAll(Set_password_screen(
               email: widget.email,
               otp: pinController.text,
             ));

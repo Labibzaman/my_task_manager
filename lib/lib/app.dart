@@ -3,7 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:task_manager_app/lib/ui/Controller/New_task_controller.dart';
+import 'package:task_manager_app/lib/ui/Controller/ScreenControllers/confirmPassword.dart';
 import 'package:task_manager_app/lib/ui/Controller/ScreenControllers/forgetController.dart';
+import 'package:task_manager_app/lib/ui/Controller/ScreenControllers/signUpcontroller.dart';
+import 'package:task_manager_app/lib/ui/Controller/ScreenControllers/taskCountController.dart';
 import 'package:task_manager_app/lib/ui/Controller/authController.dart';
 import 'package:task_manager_app/lib/ui/Controller/cancelled_controller.dart';
 import 'package:task_manager_app/lib/ui/Controller/completeTaskController.dart';
@@ -67,5 +70,8 @@ class ControllerBindings extends Bindings {
     Get.put(CancelledController());
     Get.put(CompleteTaskController());
     Get.put(ForgetController());
+    Get.put(ConfirmPasswordController());
+    Get.put(SignUpController());
+    Get.put(TaskCountController());
   }
 }

@@ -49,7 +49,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         key: _formKey,
         child: Column(
           children: [
-            ProfileSummary_Card(
+            const ProfileSummary_Card(
               onenabled: false,
             ),
             Expanded(
@@ -59,21 +59,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
+                      const SizedBox(
                         height: 28,
                       ),
                       Text(
                         'Update Profile',
                         style: Theme.of(context).textTheme.titleLarge,
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 28,
                       ),
                       Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: photoPicker(),
                       ),
-                      SizedBox(
+                      const SizedBox(
                         height: 28,
                       ),
                       TextFormField(

@@ -75,7 +75,7 @@ class _Forget_screenState extends State<Forget_screen> {
                             visible: forget.inProgress == false,
                             replacement: const Center(
                                 child: CircularProgressIndicator()),
-                            child: Text('Get OTP'),
+                            child: const Text('Get OTP'),
                           );
                         }),
                       ),
@@ -138,24 +138,3 @@ class _Forget_screenState extends State<Forget_screen> {
     }
   }
 }
-
-// Future<void> getVerifyemail() async {
-//   if(_formKey.currentState!.validate()){
-//
-//     if (mounted) {
-//       ShowSnackMessage(context, 'Please wait for confirmation');
-//     }
-//     inProgress = true;
-//     setState(() {});
-//     final NetworkResponse response =
-//     await NetworkCaller().getRequest(Urls.verifyEmail(emailControler.text));
-//     if (response.isSuccess) {
-//       Get.to(Pin_verify_screen(email:emailControler.text));
-//     } else {
-//       if (mounted) {
-//         ShowSnackMessage(context, 'Enter correct email');
-//       }
-//     }
-//     inProgress = false;
-//     setState(() {});
-//   }}

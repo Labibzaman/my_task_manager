@@ -26,7 +26,7 @@ Task_Model get taskListModel => _taskListModel;
 
     if (response.isSuccess) {
       _taskListModel = Task_Model.fromJson(response.jsonResponse);
-      return isSuccess = true;
+       isSuccess = true;
     }
     update();
     return isSuccess;

@@ -42,10 +42,7 @@ class _ProfileSummary_CardState extends State<ProfileSummary_Card> {
       return ListTile(
         onTap: () {
           if (widget.onenabled == true) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const EditProfileScreen()));
+           Get.to(const EditProfileScreen());
           }
         },
         leading: CircleAvatar(
@@ -78,13 +75,10 @@ class _ProfileSummary_CardState extends State<ProfileSummary_Card> {
           onPressed: () async {
             await AuthController.clearAuthData();
             if (mounted) {
-              Navigator.pushAndRemoveUntil(context,
-                  MaterialPageRoute(builder: (context) {
-                return const loginScreen();
-              }), (route) => false);
+              Get.offAll(const loginScreen());
             }
           },
-          icon: Icon(Icons.login_outlined),
+          icon: const Icon(Icons.login_outlined),
         ),
       );
     });

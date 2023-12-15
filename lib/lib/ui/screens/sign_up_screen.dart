@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:task_manager_app/lib/ui/Controller/ScreenControllers/signUpcontroller.dart';
 import '../../data/network_caller.dart';
 import '../../data/network_response.dart';
 import '../../data/utility/urls.dart';
 import '../widgets/body_background.dart';
 import '../widgets/snack_message.dart';
 import 'login_screen.dart';
+import 'main_bottm_nav_screen.dart';
 
 class Sign_up_screen extends StatefulWidget {
   const Sign_up_screen({super.key});
@@ -19,7 +23,7 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
   final TextEditingController _lastNameTecontroller = TextEditingController();
   final TextEditingController _MobileTecontroller = TextEditingController();
   final TextEditingController _passwordTEcontroller = TextEditingController();
-
+  SignUpController signUpController = Get.find<SignUpController>();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
 
   bool _signupInProgress = false;
@@ -48,8 +52,9 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
                       validator: (String? value) {
                         if (value?.trim().isEmpty ?? true) {
                           return 'Enter email';
-                        }if(!isValidEmail(value!)){
-                          return  'Enter a valid email';
+                        }
+                        if (!isValidEmail(value!)) {
+                          return 'Enter a valid email';
                         }
                         return null;
                       },
@@ -90,7 +95,8 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
                       validator: (String? value) {
                         if (value?.trim().isEmpty ?? true) {
                           return 'Enter Mobile';
-                        }if(!isValidPhoneNumber(value!)){
+                        }
+                        if (!isValidPhoneNumber(value!)) {
                           return 'Enter a valid Mobile number';
                         }
                         return null;
@@ -117,19 +123,18 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
                     ),
                     SizedBox(
                       width: double.infinity,
-                      child: Visibility(
-                        visible: _signupInProgress == false,
-                        replacement:
-                            const Center(child: CircularProgressIndicator()),
-                        child: Visibility(
-                          visible: _signupInProgress==false,
-                          replacement: const Center(child: CircularProgressIndicator()),
+                      child: GetBuilder<SignUpController>(builder: (signUp) {
+                        return Visibility(
+                          visible: signUp.signUpProgress == false,
+                          replacement:
+                              const Center(child: CircularProgressIndicator()),
                           child: ElevatedButton(
-                            onPressed: signUp,
-                            child: const Icon(Icons.arrow_circle_right_outlined),
+                            onPressed: singup,
+                            child:
+                                const Icon(Icons.arrow_circle_right_outlined),
                           ),
-                        ),
-                      ),
+                        );
+                      }),
                     ),
                     const SizedBox(
                       height: 28,
@@ -153,10 +158,7 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (context) {
-                              return const loginScreen();
-                            }));
+                            Get.to(const loginScreen());
                           },
                           child: const Text(
                             'Sign In',
@@ -178,52 +180,26 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
     );
   }
 
-  Future<void> signUp () async {
-
+  Future<void> singup() async {
     if (_formkey.currentState!.validate()) {
-      _signupInProgress = true;
-      if(mounted){
-        setState(() {
-
-        });
+    final response = await signUpController.signUp(
+        _emailTecontroller.text.trim(),
+        _firstNameTecontroller.text.trim(),
+        _lastNameTecontroller.text.trim(),
+        _MobileTecontroller.text.trim(),
+        _passwordTEcontroller.text.trim());
+    if (response) {
+      Get.to(const loginScreen());
+      if (mounted) {
+        ShowSnackMessage(context, signUpController.message);
       }
-      final NetworkResponse response =
-      await NetworkCaller()
-          .postRequest(Urls.registration,body: {
-        "email":_emailTecontroller.text.trim(),
-        "firstName":_firstNameTecontroller.text.trim(),
-        "lastName":_lastNameTecontroller.text.trim(),
-        "mobile":_MobileTecontroller.text.trim(),
-        "password":_passwordTEcontroller.text.trim(),
-
-      });
-      _signupInProgress = false;
-      if(mounted){
-        setState(() {
-
-        });
-      }
-      if (response.statusCode == 200) {
-        clearTextfiled();
-        if (mounted) {
-          ShowSnackMessage(
-            context,
-            'Your Account has been created, login ',
-            false,
-          );
-        }
-      } else {
-        if (mounted) {
-          ShowSnackMessage(
-            context,
-            'Your Account has not created, failed ',
-            true,
-          );
-        }
+    } else {
+      if (mounted) {
+        ShowSnackMessage(context, signUpController.message);
       }
     }
   }
-
+  }
   void clearTextfiled() {
     _emailTecontroller.clear();
     _firstNameTecontroller.clear();
@@ -241,6 +217,7 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
     _passwordTEcontroller.dispose();
     super.dispose();
   }
+
   bool isValidEmail(String email) {
     // Define a regular expression for a valid email address
     final RegExp emailRegex = RegExp(
@@ -252,9 +229,8 @@ class _Sign_up_screenState extends State<Sign_up_screen> {
   bool isValidPhoneNumber(String phoneNumber) {
     // Define a regular expression for a valid phone number
     final RegExp phoneRegex = RegExp(
-      r'^[0-9]{10}$',
+      r'^[0-9]{11}$',
     );
     return phoneRegex.hasMatch(phoneNumber);
   }
-
 }

@@ -63,8 +63,6 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
           }));
           if (response != null && response == true) {
             getTASKcount();
-            Get.find<NewTask_Controller>().getNewTaskList();
-            getTASKcount();
           }
         },
         child: const Icon(CupertinoIcons.plus_circle),
@@ -74,7 +72,8 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
           children: [
             const ProfileSummary_Card(),
             Visibility(
-              visible: taskSummaryCountprogress == false,
+              visible: taskSummaryCountprogress == false &&  (tasksummarycount.taskCountList?.isNotEmpty ??
+                  false),
               replacement: const LinearProgressIndicator(),
               child: SizedBox(
                 height: 120,
